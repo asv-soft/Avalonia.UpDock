@@ -31,26 +31,30 @@ public partial class DockingHost : DockSplitPanel
         DockIndicatorFieldStrokeThicknessProperty.GetDefaultValue(typeof(DockingTabControl)));
 
     #region Properties
-    public static StyledProperty<double> DockIndicatorFieldSizeProperty { get; private set; } =
+
+#pragma warning disable AVP1000
+    private static StyledProperty<double> DockIndicatorFieldSizeProperty { get; set; } =
+
         AvaloniaProperty.Register<DockingTabControl, double>(nameof(DockIndicatorFieldSize), 40);
 
-    public static StyledProperty<double> DockIndicatorFieldSpacingProperty { get; private set; } =
+    private static StyledProperty<double> DockIndicatorFieldSpacingProperty { get; set; } =
         AvaloniaProperty.Register<DockingTabControl, double>(nameof(DockIndicatorFieldSpacing), 10);
 
-    public static StyledProperty<float> DockIndicatorFieldCornerRadiusProperty { get; private set; } =
+    private static StyledProperty<float> DockIndicatorFieldCornerRadiusProperty { get; set; } =
         AvaloniaProperty.Register<DockingTabControl, float>(nameof(DockIndicatorFieldCornerRadius), 5);
 
-    public static StyledProperty<IBrush> DockIndicatorFieldFillProperty { get; private set; } =
+    private static StyledProperty<IBrush> DockIndicatorFieldFillProperty { get; set; } =
         AvaloniaProperty.Register<DockingTabControl, IBrush>(nameof(DockIndicatorFieldFill), new SolidColorBrush(Colors.CornflowerBlue, 0.5));
-    public static StyledProperty<IBrush> DockIndicatorFieldHoveredFillProperty { get; private set; } =
+
+    private static StyledProperty<IBrush> DockIndicatorFieldHoveredFillProperty { get; set; } =
         AvaloniaProperty.Register<DockingTabControl, IBrush>(nameof(DockIndicatorFieldHoveredFill), new SolidColorBrush(Colors.CornflowerBlue));
 
-    public static StyledProperty<IBrush> DockIndicatorFieldStrokeProperty { get; private set; } =
+    private static StyledProperty<IBrush> DockIndicatorFieldStrokeProperty { get; set; } =
         AvaloniaProperty.Register<DockingTabControl, IBrush>(nameof(DockIndicatorFieldStroke), Brushes.CornflowerBlue);
 
-    public static StyledProperty<double> DockIndicatorFieldStrokeThicknessProperty { get; private set; } =
+    private static StyledProperty<double> DockIndicatorFieldStrokeThicknessProperty { get; set; } =
         AvaloniaProperty.Register<DockingTabControl, double>(nameof(DockIndicatorFieldStrokeThickness), 1);
-
+#pragma warning restore AVP1000
     public double DockIndicatorFieldSize
     { get => GetValue(DockIndicatorFieldSizeProperty); set => SetValue(DockIndicatorFieldSizeProperty, value); }
     public double DockIndicatorFieldSpacing
@@ -157,7 +161,9 @@ public partial class DockingHost : DockSplitPanel
 
     private void UnregisterSplitPanel(SplitPanel splitPanel)
     {
-        Debug.Assert(_registeredSplitPanels.Remove(splitPanel, out var handler));
+        if (!_registeredSplitPanels.Remove(splitPanel, out var handler))
+            throw new InvalidOperationException("Handler was not found in registered split panels.");
+
         splitPanel.Children.CollectionChanged -= handler;
 
         foreach (var child in splitPanel.Children)
@@ -168,6 +174,7 @@ public partial class DockingHost : DockSplitPanel
                 UnregisterSplitPanel(childSplitPanel);
         }
     }
+
 
     private void RegisterTabControlForDocking(TabControl tabControl)
     {
@@ -183,7 +190,8 @@ public partial class DockingHost : DockSplitPanel
 
     private void UnregisterTabControl(TabControl tabControl)
     {
-        Debug.Assert(_registeredTabControls.Remove(tabControl, out var handler));
+        if (_registeredTabControls.Remove(tabControl, out var handler))
+            throw new InvalidOperationException("Handler was not found in registered tab controls.");
         tabControl.Items.CollectionChanged -= handler;
 
         if (tabControl is DockingTabControl dockingTabControl)
