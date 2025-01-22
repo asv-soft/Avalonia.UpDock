@@ -70,4 +70,4 @@ jobs:
       - name: Pushing packages to Github
         run: |
           cd src    
-          dotnet nuget push ${{ env.PACKAGE_OUTPUT_DIRECTORY }}Asv.Avalonia.UpDock.${{ env.VERSION }}.nupkg -k ${{ secrets.GIHUB_NUGET_AUTH_TOKEN }} --skip-duplicate -s ${{ env.GITHUB_PACKAGES_URL }}
+          dotnet nuget push ${{ env.PACKAGE_OUTPUT_DIRECTORY }}Avalonia.UpDock.${{ env.VERSION }}.nupkg -k ${{ secrets.GIHUB_NUGET_AUTH_TOKEN }} --skip-duplicate -s ${{ env.GITHUB_PACKAGES_URL }}
